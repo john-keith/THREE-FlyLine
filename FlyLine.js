@@ -37,7 +37,7 @@ class FlyLine extends THREE.Object3D{
                     gl_FragColor = vec4(color, alpha);
                 }`
 
-            let tubeGeo = new THREE.TubeBuffferGeometry(curve, 10, 0.15, 40)
+            let tubeGeo = new THREE.TubeBufferGeometry(curve, 10, 0.15, 40)
             let shaderMat = new THREE.ShaderMaterial({
                 uniforms: {
                     time: {
