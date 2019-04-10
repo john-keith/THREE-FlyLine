@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./three.min.js"></script>
+    <script src="./OrbitControls.js"></script>
+    <script src="./FlyLine.js"></script>
+</head>
+
+<body>
+        <style>
+                html, body{
+                    height: 100%;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                }
+                #output{
+                    height: 100%;
+                    width: 100%;
+                    display: block;
+                }
+            </style>
+            <body>
+                <div id="output"></div>
+            </body>
+</body>
+<script>
+
+  let scene
+  let camera
+  let renderer
+ const init = (dom) => {
+    scene = new THREE.Scene()
+    
+    let light = new THREE.DirectionalLight( 0xffffff)
+    light.castShadow = true
+    light.position.set(140, 90, 80)
+    scene.add( light )
+
+    let ambientLight = new THREE.AmbientLight( 0x404040, 0.5)
+    scene.add(ambientLight)
+
+    size = {
+        width: dom.offsetWidth,
+        height: dom.offsetHeight
+    }
+    camera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.5, 20000)
+    camera.position.set(45, 85, 15)
+    camera.lookAt(scene.position)
+    camera.up.set(0, 0, 1)
+
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true
+    })
+    renderer.setSize(size.width, size.height)
+    renderer.setClearColor(0x000000)
+    renderer.setPixelRatio(window.devicePixelRatio)
+    dom.appendChild(renderer.domElement)
+ }
+ var dom = document.querySelector('#output')
+ init(dom)
+
+ let controls = new THREE.OrbitControls(camera, renderer.domElement)
+  controls.enablePan = false
+  controls.maxDistance = 150
+  controls.minDistance = 80
+  controls.zoomSpeed = 0.6
+  controls.rotateSpeed = 0.2
+  controls.update()
+
+  //  生成路径
+  const geo = new THREE.DodecahedronGeometry(15,1)
+  const lines = new THREE.CatmullRomCurve3 (geo.vertices)
+  
+  //测试
+  const test = new FlyLine(lines, 0x00ffff, true)
+  scene.add(test)
+
+  //测试
+  const test1 = new FlyLine(lines, 0xff0000)
+  test1.position.set(10, 10, 10)
+  scene.add(test1)
+
+  const render = () => {
+    renderer.render(scene, camera)
+    requestAnimationFrame(render)
+    test.update()
+    test1.update()
+  }
+  render()
+
+</script>
+</html>
