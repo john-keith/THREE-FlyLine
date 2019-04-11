@@ -5,6 +5,7 @@ class FlyLine extends THREE.Object3D{
      * color 颜色
      * segFlag 设置分段标记 （周期）
      * alphaTest 启用透明测试
+     * radius 半径只有首参数为curve可用
     */
         constructor(curveOrObject, options){
             super()
@@ -12,6 +13,7 @@ class FlyLine extends THREE.Object3D{
             let color = options && options.color || 0xffffff
             let segFlag = options && options.segFlag || false
             let alphaTest = options && options.alphaTest || true
+            let radius = options && options.radius || 1
             
             this.mesh = null
             let v_shader = `
@@ -53,7 +55,7 @@ class FlyLine extends THREE.Object3D{
             let geo
             
             if(curveOrObject instanceof THREE.Curve){
-                geo = new THREE.TubeBufferGeometry(curveOrObject, 10, 0.15, 4)
+                geo = new THREE.TubeBufferGeometry(curveOrObject, 10, 0.15 * radius, 4)
             }else if(curveOrObject instanceof THREE.Geometry || curveOrObject instanceof THREE.BufferGeometry ){
                 geo = curveOrObject
             }else {
