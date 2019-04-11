@@ -3,8 +3,9 @@ class FlyLine extends THREE.Object3D{
      * curveOrObject 路径 THREE.Curve实例或者bufferGeo/geo实例
      * color 颜色
      * segFlag 设置是不是单周期
+     * alphaTest 启用透明测试
     */
-        constructor(curveOrObject, color, segFlag = false){
+        constructor(curveOrObject, color, segFlag = false, alphaTest = true){
             super()
 
             this.mesh = null
@@ -17,8 +18,10 @@ class FlyLine extends THREE.Object3D{
                 }`
 
             let define = segFlag ? '#define SEGFLAG': ''
+            let alpha = alphaTest ? '#define ALPHATEST': ''
             let f_shader = `
                 ${define}
+                ${alpha}
                 #define PI 3.141592
                 uniform float time;
                 varying vec2 vUv;
@@ -35,6 +38,11 @@ class FlyLine extends THREE.Object3D{
                         #endif
                     }
                     gl_FragColor = vec4(color, alpha);
+                    #ifdef ALPHATEST
+                    if(gl_FragColor.a < 0.3){
+                        discard;
+                    }
+                    #endif
                 }`
 
             let geo
@@ -58,7 +66,6 @@ class FlyLine extends THREE.Object3D{
                 vertexShader: v_shader,
                 fragmentShader: f_shader,
                 transparent: true,
-                alphaTest: 0.5,
                 blending: THREE.AdditiveBlending
             })
             this.mesh = new THREE.Mesh(geo, shaderMat)
