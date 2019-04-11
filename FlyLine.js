@@ -1,10 +1,10 @@
 class FlyLine extends THREE.Object3D{
     /**
-     * curve 路径 THREE.Curve实例
+     * curveOrObject 路径 THREE.Curve实例或者bufferGeo/geo实例
      * color 颜色
      * segFlag 设置是不是单周期
     */
-        constructor(curve, color, segFlag = false){
+        constructor(curveOrObject, color, segFlag = false){
             super()
 
             this.mesh = null
@@ -37,7 +37,15 @@ class FlyLine extends THREE.Object3D{
                     gl_FragColor = vec4(color, alpha);
                 }`
 
-            let tubeGeo = new THREE.TubeBufferGeometry(curve, 10, 0.15, 40)
+            let geo
+            
+            if(curveOrObject instanceof THREE.Curve){
+                geo = new THREE.TubeBufferGeometry(curveOrObject, 10, 0.15, 4)
+            }else if(curveOrObject instanceof THREE.Geometry || curveOrObject instanceof THREE.BufferGeometry ){
+                geo = curveOrObject
+            }else {
+                throw new Error('please ensure first argument correct')
+            }
             let shaderMat = new THREE.ShaderMaterial({
                 uniforms: {
                     time: {
@@ -53,7 +61,7 @@ class FlyLine extends THREE.Object3D{
                 alphaTest: 0.5,
                 blending: THREE.AdditiveBlending
             })
-            this.mesh = new THREE.Mesh(tubeGeo, shaderMat)
+            this.mesh = new THREE.Mesh(geo, shaderMat)
             this.add(this.mesh)
         }
         get time(){
