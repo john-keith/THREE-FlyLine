@@ -1,13 +1,18 @@
 class FlyLine extends THREE.Object3D{
     /**
      * curveOrObject 路径 THREE.Curve实例或者bufferGeo/geo实例
+     * 
      * color 颜色
-     * segFlag 设置是不是单周期
+     * segFlag 设置分段标记 （周期）
      * alphaTest 启用透明测试
     */
-        constructor(curveOrObject, color, segFlag = false, alphaTest = true){
+        constructor(curveOrObject, options){
             super()
 
+            let color = options && options.color || 0xffffff
+            let segFlag = options && options.segFlag || false
+            let alphaTest = options && options.alphaTest || true
+            
             this.mesh = null
             let v_shader = `
                 varying vec2 vUv;
