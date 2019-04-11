@@ -23,94 +23,133 @@
                     width: 100%;
                     display: block;
                 }
-            </style>
+                #demo{
+                  width: 100px;
+                  height: 50px;
+                  position: absolute;
+                }
+        </style>
+
             <body>
+                <select id='demo' value='1'>
+                  <option value="1">样例1</option>
+                  <option value="2">样例2</option>
+                  <option value="3">样例3</option>
+                </select>
                 <div id="output"></div>
             </body>
+
+            <script>
+                let scene
+                let camera
+                let renderer
+               const init = (dom) => {
+                  scene = new THREE.Scene()
+                  
+                  let light = new THREE.DirectionalLight( 0xffffff)
+                  light.castShadow = true
+                  light.position.set(140, 90, 80)
+                  scene.add( light )
+              
+                  let ambientLight = new THREE.AmbientLight( 0x404040, 0.5)
+                  scene.add(ambientLight)
+              
+                  size = {
+                      width: dom.offsetWidth,
+                      height: dom.offsetHeight
+                  }
+                  camera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.5, 20000)
+                  camera.position.set(45, 85, 15)
+                  camera.lookAt(scene.position)
+                  camera.up.set(0, 0, 1)
+              
+                  renderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: true
+                  })
+                  renderer.setSize(size.width, size.height)
+                  renderer.setClearColor(0x000000)
+                  renderer.setPixelRatio(window.devicePixelRatio)
+                  dom.appendChild(renderer.domElement)
+               }
+               let dom = document.querySelector('#output')
+               init(dom)
+              
+               let controls = new THREE.OrbitControls(camera, renderer.domElement)
+                controls.enablePan = false
+                controls.maxDistance = 150
+                controls.minDistance = 80
+                controls.zoomSpeed = 0.6
+                controls.rotateSpeed = 0.2
+                controls.update()
+              
+                //  生成路径
+                const geo = new THREE.DodecahedronGeometry(15,1)
+                const lines = new THREE.CatmullRomCurve3 (geo.vertices)
+                
+                //测试
+                let test = new FlyLine(lines, {
+                  color: 0x00ffff,
+                  segFlag: true
+                })
+                scene.add(test)
+              
+                document.querySelector('#demo').addEventListener('change', (e) => {
+                  let value = e.target.value
+
+                  scene.remove(test)
+                  test.dispose()
+                  test = null
+                  if(value == '1'){
+                    test = new FlyLine(lines, {
+                      color: 0x00ffff,
+                      segFlag: true
+                    })
+                  }else if(value == '2'){
+                    const bufferGeo = new THREE.CircleGeometry( 15, 32 )
+                    test = new FlyLine(bufferGeo,{
+                      color: 0xff0000,
+                      alphaTest: false
+                    })
+                  }else if(value == '3'){
+                    const Geo = new THREE.TorusKnotGeometry( 10, 3, 100, 16 )
+                    test = new FlyLine(Geo,{
+                      color: 0x0099FF,
+                      segFlag: true,
+                      alphaTest: false
+                    })
+                  }
+
+                  scene.add(test)
+
+                }, false)
+              
+                //测试
+                // const bufferGeo = new THREE.CircleGeometry( 5, 32 )
+                // const test1 = new FlyLine(bufferGeo,{
+                //   color: 0xff0000,
+                //   alphaTest: false
+                // })
+                // test1.position.set(10, 10, 10)
+                // scene.add(test1)
+              
+                  //测试
+                // const Geo = new THREE.TorusKnotGeometry( 10, 3, 100, 16 )
+                // const test2 = new FlyLine(Geo,{
+                //   color: 0x0099FF,
+                //   segFlag: true,
+                //   alphaTest: false
+                // })
+                // test2.position.set(-10, -10, -10)
+                // scene.add(test2)
+              
+                const render = () => {
+                  renderer.render(scene, camera)
+                  requestAnimationFrame(render)
+                  test && test.update()
+                }
+                render()
+              
+              </script>
 </body>
-<script>
-
-  let scene
-  let camera
-  let renderer
- const init = (dom) => {
-    scene = new THREE.Scene()
-    
-    let light = new THREE.DirectionalLight( 0xffffff)
-    light.castShadow = true
-    light.position.set(140, 90, 80)
-    scene.add( light )
-
-    let ambientLight = new THREE.AmbientLight( 0x404040, 0.5)
-    scene.add(ambientLight)
-
-    size = {
-        width: dom.offsetWidth,
-        height: dom.offsetHeight
-    }
-    camera = new THREE.PerspectiveCamera(45, size.width / size.height, 0.5, 20000)
-    camera.position.set(45, 85, 15)
-    camera.lookAt(scene.position)
-    camera.up.set(0, 0, 1)
-
-    renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true
-    })
-    renderer.setSize(size.width, size.height)
-    renderer.setClearColor(0x000000)
-    renderer.setPixelRatio(window.devicePixelRatio)
-    dom.appendChild(renderer.domElement)
- }
- let dom = document.querySelector('#output')
- init(dom)
-
- let controls = new THREE.OrbitControls(camera, renderer.domElement)
-  controls.enablePan = false
-  controls.maxDistance = 150
-  controls.minDistance = 80
-  controls.zoomSpeed = 0.6
-  controls.rotateSpeed = 0.2
-  controls.update()
-
-  //  生成路径
-  const geo = new THREE.DodecahedronGeometry(15,1)
-  const lines = new THREE.CatmullRomCurve3 (geo.vertices)
-  
-  //测试
-  const test = new FlyLine(lines, {
-    color: 0x00ffff,
-    segFlag: true
-  })
-  scene.add(test)
-
-  //测试
-  const bufferGeo = new THREE.CircleGeometry( 5, 32 )
-  const test1 = new FlyLine(bufferGeo,{
-    color: 0xff0000,
-    alphaTest: false
-  })
-  test1.position.set(10, 10, 10)
-  scene.add(test1)
-
-    //测试
-  const Geo = new THREE.TorusKnotGeometry( 10, 3, 100, 16 )
-  const test2 = new FlyLine(Geo,{
-    color: 0x0099FF,
-    segFlag: true,
-    alphaTest: false
-  })
-  test1.position.set(-10, -10, -10)
-  scene.add(test2)
-
-  const render = () => {
-    renderer.render(scene, camera)
-    requestAnimationFrame(render)
-    test.update()
-    test1.time = test1.time + 0.15
-    test2.update()
-  }
-  render()
-
-</script>
 </html>
